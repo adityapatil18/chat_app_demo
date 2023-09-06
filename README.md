@@ -1,16 +1,14 @@
-# chat_app2
+# chat_app_demo
 
-A new Flutter project.
+This is simple chat app by using:
 
-## Getting Started
+1.firebase
+2.firestore
+3.Firebase Authentication 
+4.Provider
 
-This project is a starting point for a Flutter application.
+In this app first there is login and sign up page .After that list of logged users. send and recive the messages from user.
 
-A few resources to get you started if this is your first Flutter project:
+Remaining implement will be done later.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
