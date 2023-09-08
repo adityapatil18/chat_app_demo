@@ -1,4 +1,5 @@
 import 'package:chat_app2/auth/auth_services.dart';
+import 'package:chat_app2/auth/remote_config.dart';
 import 'package:chat_app2/screens/chat_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -15,12 +16,15 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
 // instance of auth
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final remoteConfig = FirebaseRemoteConfigService();
 
   @override
   Widget build(BuildContext context) {
     final authServices = Provider.of<AuthServices>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
+        title: Text(
+            remoteConfig.getString(FirebaseRemoteConfigKeys.welcomeMessage)),
         actions: [
           IconButton(
             onPressed: () {
@@ -62,7 +66,9 @@ class _HomePageState extends State<HomePage> {
     //display all user except current user
     if (_auth.currentUser!.email != data['email']) {
       return ListTile(
-        title: Text(data['email'],),
+        title: Text(
+          data['email'],
+        ),
         onTap: () {
           // pass the clicked user's UID to the chat page
           Navigator.push(

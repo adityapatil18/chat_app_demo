@@ -1,10 +1,14 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:chat_app2/auth/chat_services.dart';
+import 'package:chat_app2/screens/chat_ui.dart';
 import 'package:chat_app2/widgets/custom_textfield.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage(
@@ -17,10 +21,16 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
+  File? imageFile;
+  String imageUrl = '';
+  bool _isLoading = false;
+
   final TextEditingController _messageController = TextEditingController();
   final ChatServices _chatServices = ChatServices();
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
   var streamController = StreamController.broadcast();
+
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
@@ -32,7 +42,48 @@ class _ChatPageState extends State<ChatPage> {
     super.initState();
   }
 
-  void sendMessage() async {
+  Future getImage() async {
+    ImagePicker imagePicker = ImagePicker();
+    final pickedFile;
+    pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      imageFile = File(pickedFile.path);
+      if (imageFile != null) {
+        setState(() {
+          _isLoading = true;
+        });
+        uploadImageFile();
+      }
+    }
+  }
+
+  void uploadImageFile() async {
+    String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+    UploadTask uploadTask = _chatServices.uploadImageFile(
+      imageFile!,
+    );
+    try {
+      TaskSnapshot snapshot = await uploadTask;
+      imageUrl = await snapshot.ref.getDownloadURL();
+      setState(() {
+        _isLoading = false;
+        sendMessage(imageUrl, MessageType.image);
+      });
+    } on FirebaseException catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            e.toString(),
+          ),
+        ),
+      );
+    }
+  }
+
+  void sendMessage(String content, int type) async {
     // only send message if there is something to send
     if (_messageController.text.isNotEmpty) {
       await _chatServices.sendMessage(
@@ -58,6 +109,10 @@ class _ChatPageState extends State<ChatPage> {
 
           // user input
           _buildMessageInput(),
+
+          SizedBox(
+            height: 25,
+          ),
         ],
       ),
     );
@@ -106,9 +161,13 @@ class _ChatPageState extends State<ChatPage> {
       child: Padding(
         padding: const EdgeInsets.all(10.0),
         child: Column(
+          crossAxisAlignment:
+              (data['senderId'] == _firebaseAuth.currentUser!.uid)
+                  ? CrossAxisAlignment.end
+                  : CrossAxisAlignment.start,
           children: [
-            Text(data['senderEmail']),
-            Text(data['message']),
+            // Text(data['senderEmail']),
+            ChatUi(message: data['message']),
           ],
         ),
       ),
@@ -117,27 +176,38 @@ class _ChatPageState extends State<ChatPage> {
 
   //build message input
   Widget _buildMessageInput() {
-    return Row(
-      children: [
-        //text field
-        Expanded(
-          child: CustomTextFiled(
-            controller: _messageController,
-            hintText: 'enter message',
-            obsecureText: false,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15),
+      child: Row(
+        children: [
+          //image Button
+          IconButton(
+            onPressed: getImage,
+            icon: Icon(
+              Icons.camera_enhance_sharp,
+              size: 30,
+            ),
           ),
-        ),
-        //sendButton
-        IconButton(
-          onPressed: () {
-            sendMessage();
-          },
-          icon: Icon(
-            Icons.send,
-            size: 30,
+          //text field
+          Expanded(
+            child: CustomTextFiled(
+              controller: _messageController,
+              hintText: 'enter message',
+              obsecureText: false,
+            ),
           ),
-        ),
-      ],
+          //sendButton
+          IconButton(
+            onPressed: () {
+              sendMessage(_messageController.text, MessageType.image);
+            },
+            icon: Icon(
+              Icons.send,
+              size: 30,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
