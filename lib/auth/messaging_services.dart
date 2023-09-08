@@ -39,37 +39,38 @@
 //   }
 // }
 
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+/////////////////////////////////////////
+// import 'package:firebase_messaging/firebase_messaging.dart';
+// import 'package:flutter/material.dart';
+// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-class NotificationService {
-  static const Key =
-      'AAAAumu0igQ:APA91bF3b1ona0wdAUyzyz4n3Q2pRBOwVJh3TkF7k6L4riNj4S4SMiQnkpNI4eQJXW0GPRSImRYjdVbcnOXFP_P1L_HdtGMEQzN4zv9v3lzi2FAcDI51qu3LkSQyxRDzT4eOnAR8Kw0j';
+// class NotificationService {
+//   static const Key =
+//       'AAAAumu0igQ:APA91bF3b1ona0wdAUyzyz4n3Q2pRBOwVJh3TkF7k6L4riNj4S4SMiQnkpNI4eQJXW0GPRSImRYjdVbcnOXFP_P1L_HdtGMEQzN4zv9v3lzi2FAcDI51qu3LkSQyxRDzT4eOnAR8Kw0j';
 
-  final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+//   final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
-  void initLocalNotification() {
-    const androidSettings =
-        AndroidInitializationSettings('"@mipmap/ic_launcher');
-    const initializationSettings =
-        InitializationSettings(android: androidSettings);
-    flutterLocalNotificationsPlugin.initialize(
-      initializationSettings,
-      onDidReceiveNotificationResponse: (details) {
-        debugPrint(details.payload.toString());
-      },
-    );
-  }
+//   void initLocalNotification() {
+//     const androidSettings =
+//         AndroidInitializationSettings('"@mipmap/ic_launcher');
+//     const initializationSettings =
+//         InitializationSettings(android: androidSettings);
+//     flutterLocalNotificationsPlugin.initialize(
+//       initializationSettings,
+//       onDidReceiveNotificationResponse: (details) {
+//         debugPrint(details.payload.toString());
+//       },
+//     );
+//   }
 
-  Future<void> _showLocalNotifications(RemoteMessage message) async {
-    final androidDetals = AndroidNotificationDetails(
-        'mychannelid', 'com.example.chat_app2.urgent',
-        importance: Importance.max,
-        styleInformation: styleInformation,
-        priority: Priority.max);
-    final notificationDetails = NotificationDetails();
-    await flutterLocalNotificationsPlugin.show(
-        0, message.notification!.body, message.notification!.title);
-  }
-}
+//   Future<void> _showLocalNotifications(RemoteMessage message) async {
+//     final androidDetals = AndroidNotificationDetails(
+//         'mychannelid', 'com.example.chat_app2.urgent',
+//         importance: Importance.max,
+//         styleInformation: styleInformation,
+//         priority: Priority.max);
+//     final notificationDetails = NotificationDetails();
+//     await flutterLocalNotificationsPlugin.show(
+//         0, message.notification!.body, message.notification!.title);
+//   }
+// }
