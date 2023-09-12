@@ -18,12 +18,17 @@ class AuthServices extends ChangeNotifier {
       UserCredential userCredential = await _firebaseAuth
           .signInWithEmailAndPassword(email: email, password: password);
 
-          //add new document for the user in users collection if it doesn't already exits
-           
-             _firestore.collection('users').doc(userCredential.user!.uid).set({
+      //add new document for the user in users collection if it doesn't already exits
+
+      _firestore.collection('users').doc(userCredential.user!.uid).set({
         'uid': userCredential.user!.uid,
         'email': email,
       }, SetOptions(merge: true));
+
+      // //
+      // _firestore.collection('threads').doc(userCredential.user!.uid).set(
+      //     {'uid': userCredential.user!.uid, 'email': email},
+      //     SetOptions(merge: true));
 
       return userCredential;
     }
@@ -46,6 +51,12 @@ class AuthServices extends ChangeNotifier {
         'email': email,
       });
 
+      //create a new document for the threads
+      // _firestore
+      //     .collection('threads')
+      //     .doc(userCredential.user!.uid)
+      //     .set({'uid': userCredential.user!.uid, 'email': email});
+
       return userCredential;
     } on FirebaseAuthException catch (e) {
       throw Exception(e.code);
@@ -56,6 +67,4 @@ class AuthServices extends ChangeNotifier {
   Future<void> signOut() async {
     return await FirebaseAuth.instance.signOut();
   }
-
-
 }

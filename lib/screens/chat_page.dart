@@ -2,18 +2,21 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:chat_app2/auth/chat_services.dart';
+import 'package:chat_app2/auth/thread_services.dart';
 import 'package:chat_app2/screens/chat_ui.dart';
+import 'package:chat_app2/screens/threads_page.dart';
 import 'package:chat_app2/widgets/custom_textfield.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage(
-      {super.key, required this.reciverUserEmail, required this.reciverUserID});
-  final String reciverUserEmail;
+      {super.key, required this.reciverUserID, required this.threadname});
+  final String threadname;
   final String reciverUserID;
 
   @override
@@ -37,7 +40,7 @@ class _ChatPageState extends State<ChatPage> {
       List<String> ids = [widget.reciverUserID, _firebaseAuth.currentUser!.uid];
       ids.sort();
       String chatRoomId = ids.join('_');
-      _chatServices.getMessages(chatRoomId, streamController);
+      _chatServices.getMessages(widget.reciverUserID, streamController);
     });
     super.initState();
   }
@@ -98,7 +101,13 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.reciverUserEmail),
+        title: Text(widget.threadname),
+        leading: IconButton(
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => ThreadPage()));
+            },
+            icon: Icon(Icons.arrow_back)),
       ),
       body: Column(
         children: [

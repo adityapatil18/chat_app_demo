@@ -15,8 +15,6 @@ class ChatServices extends ChangeNotifier {
   //instance of storage
   final FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
 
-  
-
 // send message
   Future<void> sendMessage(
     String recieverId,
@@ -45,7 +43,7 @@ class ChatServices extends ChangeNotifier {
     //add new  message to database
     await _firestore
         .collection('chat_rooms')
-        .doc(chatRoomId)
+        .doc(recieverId)
         .collection('messages')
         .add(newMessage.toMap());
   }

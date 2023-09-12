@@ -1,22 +1,26 @@
 import 'package:chat_app2/auth/auth_services.dart';
 import 'package:chat_app2/auth/remote_config.dart';
+import 'package:chat_app2/auth/thread_services.dart';
 import 'package:chat_app2/screens/chat_page.dart';
+import 'package:chat_app2/screens/threads_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class UsersPage extends StatefulWidget {
+  const UsersPage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<UsersPage> createState() => _UsersPageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _UsersPageState extends State<UsersPage> {
 // instance of auth
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final remoteConfig = FirebaseRemoteConfigService();
+  TextEditingController _threadController = TextEditingController();
+  final ThreadServices _threadServices = ThreadServices();
 
   @override
   Widget build(BuildContext context) {
@@ -71,19 +75,48 @@ class _HomePageState extends State<HomePage> {
         ),
         onTap: () {
           // pass the clicked user's UID to the chat page
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ChatPage(
-                reciverUserEmail: data['email'],
-                reciverUserID: data['uid'],
-              ),
-            ),
+
+          // Navigator.push(
+          //   context,
+          //   MaterialPageRoute(
+          //     builder: (context) => ChatPage(
+          //       reciverUserEmail: data['email'],
+          //       reciverUserID: data['uid'],
+          //     ),
+          //   ),
+          // );
+          showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text('Enter your Thread Name'),
+                content: TextField(
+                  controller: _threadController,
+                ),
+                actions: [
+                  ElevatedButton(
+                    onPressed: () {
+                      save(data['uid']);
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => ThreadPage()));
+                    },
+                    child: Text("Ok"),
+                  ),
+                ],
+              );
+            },
           );
         },
       );
     } else {
       return Container();
+    }
+  }
+
+  Future save(String reciverId) async {
+    if (_threadController.text.isNotEmpty) {
+      await _threadServices.save(
+          _auth.currentUser!.uid, reciverId, _threadController.text.toString());
     }
   }
 }
